@@ -1,0 +1,135 @@
+
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#090914">
+<title>NEXA-ID | Game Marketplace</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#090914;color:#fff;font-family:Arial,sans-serif}
+header{padding:18px 6%;display:flex;justify-content:space-between;align-items:center;background:#111120;border-bottom:1px solid #292443;position:sticky;top:0;z-index:5}
+.logo{font-size:25px;font-weight:900;color:#a78bfa}
+.logo span{color:#fff}
+button{cursor:pointer;border:0;color:white;border-radius:9px;padding:11px 16px;background:#713bea}
+nav{display:flex;gap:12px;align-items:center}
+nav button{background:transparent}
+.hero{padding:65px 7%;background:radial-gradient(ellipse at 80% 20%,#45228a 0%,transparent 50%),linear-gradient(120deg,#17132e,#0c0c19)}
+.hero small{color:#bba6ff;letter-spacing:3px}
+.hero h1{font-size:clamp(38px,8vw,65px);margin:15px 0}
+.hero h1 span{color:#a78bfa}
+.hero p{color:#c3bfd3;line-height:1.8;max-width:550px}
+.section{padding:35px 6%}
+.section h2{font-size:24px}
+.categories{display:flex;gap:10px;overflow-x:auto;padding:10px 0 20px}
+.categories button{white-space:nowrap;background:#19182b;border:1px solid #38304f}
+.categories button.active{background:#713bea}
+.search{width:100%;padding:14px;background:#151526;border:1px solid #39314f;color:white;border-radius:10px;margin:12px 0}
+.products{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:17px}
+.product{background:#151526;border:1px solid #302a48;border-radius:13px;overflow:hidden}
+.product .cover{height:130px;background:linear-gradient(135deg,#30205b,#161629);display:grid;place-items:center;font-size:42px}
+.info{padding:15px}
+.info p{color:#aaa5bd;font-size:13px}
+.price{color:#b69aff;font-weight:bold;font-size:21px}
+.buy{width:100%;margin-top:12px}
+.badge{font-size:11px;color:#bca6ff}
+.empty{color:#aaa;text-align:center;padding:35px;display:none}
+footer{text-align:center;padding:30px;color:#8e899f;border-top:1px solid #292443;margin-top:35px}
+</style>
+</head>
+<body>
+
+<header>
+ <div class="logo">NEXA<span>-ID</span></div>
+ <nav>
+  <button onclick="scrollToShop()">สินค้า</button>
+  <button onclick="showCart()">🛒 <span id="cart">0</span></button>
+ </nav>
+</header>
+
+<section class="hero">
+ <small>WELCOME TO NEXA-ID</small>
+ <h1>YOUR GAME.<br><span>YOUR IDENTITY.</span></h1>
+ <p>ตลาดซื้อขายไอดีเกม รวมไอดีเกมหลากหลายประเภท เลือกชมสินค้าและค้นหาไอดีที่คุณต้องการ</p>
+ <button onclick="scrollToShop()">เลือกชมสินค้า →</button>
+</section>
+
+<section class="section" id="shop">
+ <h2>🎮 หมวดหมู่เกม</h2>
+ <div class="categories">
+  <button class="active" onclick="filterGame('ทั้งหมด',this)">ทั้งหมด</button>
+  <button onclick="filterGame('ROV',this)">ROV</button>
+  <button onclick="filterGame('Free Fire',this)">Free Fire</button>
+  <button onclick="filterGame('Roblox',this)">Roblox</button>
+  <button onclick="filterGame('Genshin Impact',this)">Genshin Impact</button>
+ </div>
+
+ <h2>🔥 สินค้าทั้งหมด</h2>
+ <input class="search" id="search" placeholder="🔍 ค้นหาไอดีเกม..." oninput="renderProducts()">
+ <div class="products" id="products"></div>
+ <div class="empty" id="empty">ไม่พบสินค้าที่ค้นหา</div>
+</section>
+
+<footer>
+ <div class="logo">NEXA-ID</div>
+ <p>GAME ACCOUNT MARKETPLACE</p>
+ <p>© 2026 NEXA-ID. All rights reserved.</p>
+ <small>สินค้าตัวอย่างสำหรับแสดงผล ระบบซื้อขายยังไม่เปิดใช้งาน</small>
+</footer>
+
+<script>
+const items=[
+ {name:"ไอดี ROV ตัวอย่าง",game:"ROV",price:199,icon:"⚔️"},
+ {name:"ไอดี Free Fire ตัวอย่าง",game:"Free Fire",price:299,icon:"🔥"},
+ {name:"ไอดี Roblox ตัวอย่าง",game:"Roblox",price:159,icon:"🧱"},
+ {name:"ไอดี Genshin ตัวอย่าง",game:"Genshin Impact",price:399,icon:"✨"},
+ {name:"ไอดี ROV ระดับเริ่มต้น",game:"ROV",price:99,icon:"🎮"},
+ {name:"ไอดี Free Fire พิเศษ",game:"Free Fire",price:499,icon:"💎"}
+];
+let category="ทั้งหมด";
+let cart=0;
+
+function renderProducts(){
+ const search=document.getElementById("search").value.toLowerCase();
+ const filtered=items.filter(p=>
+ (category==="ทั้งหมด"||p.game===category)&&
+ p.name.toLowerCase().includes(search)
+ );
+ document.getElementById("products").innerHTML=filtered.map(p=>`
+ <article class="product">
+  <div class="cover">${p.icon}</div>
+  <div class="info">
+   <span class="badge">${p.game}</span>
+   <h3>${p.name}</h3>
+   <p>สินค้าแสดงตัวอย่าง</p>
+   <div class="price">฿${p.price}</div>
+   <button class="buy" onclick="addCart()">เพิ่มลงตะกร้า</button>
+  </div>
+ </article>
+ `).join("");
+ document.getElementById("empty").style.display=filtered.length?"none":"block";
+}
+
+function filterGame(game,button){
+ category=game;
+ document.querySelectorAll(".categories button").forEach(b=>b.classList.remove("active"));
+ button.classList.add("active");
+ renderProducts();
+}
+function addCart(){
+ cart++;
+ document.getElementById("cart").textContent=cart;
+ alert("เพิ่มสินค้าตัวอย่างลงตะกร้าแล้ว");
+}
+function showCart(){
+ alert("มีสินค้าในตะกร้า "+cart+" รายการ (ระบบชำระเงินยังไม่เปิดใช้งาน)");
+}
+function scrollToShop(){
+ document.getElementById("shop").scrollIntoView({behavior:"smooth"});
+}
+renderProducts();
+</script>
+</body>
+  </html>
+  
